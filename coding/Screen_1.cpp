@@ -1,4 +1,3 @@
-#include <emscripten.h>
 #include "Screen_1.h"
 
 Screen_1::Screen_1(AssetManager* _am) : am(_am), player(_am), status_bar(_am), menu(_am), highscore(_am), teleport(_am)
@@ -240,9 +239,6 @@ int Screen_1::Run(sf::RenderWindow& window)
 		}
 
 		window.display();
-#ifdef __EMSCRIPTEN__
-		emscripten_sleep(0);
-#endif
 	}
 }
 
