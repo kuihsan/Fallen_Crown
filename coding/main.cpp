@@ -1,3 +1,4 @@
+#include <emscripten.h>
 #include <SFML/Graphics.hpp>//preprocessor directive
 //This include the SFML library for graphics, it allows the program to use classes such as sf::RenderWindow and sf::Event which are used for creating and managing the game window and handling events such as user input.
 #include <SFML/Window.hpp>
@@ -36,7 +37,9 @@ int main()
 			Screens.push_back(s0); // pushes the new instance to the vector
 			screen = 0; // sets the screen variable to 0
 		}
+#ifdef __EMSCRIPTEN__
+		emscripten_sleep(0);
+#endif
 	}
 	return 0; // returns 0 at the end of the main function
 }
-
