@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fallen Crown</title>
+  <style>
+    body { margin: 0; background: #000; color: #fff; font-family: Arial, sans-serif; }
+    .wrap { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    canvas { background: #000; image-rendering: pixelated; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+  </div>
+  <script>
+    var Module = {
+      canvas: (function() {
+        var canvas = document.getElementById('canvas');
+        canvas.width = 1920;
+        canvas.height = 1080;
+        return canvas;
+      })(),
+      onRuntimeInitialized: function() {
+        console.log('Fallen Crown ready');
+      }
+    };
+  </script>
+  <script src="main.js"></script>
+</body>
+</html>

@@ -5,6 +5,36 @@
 //This class is the main game screen and it contains the game logic and the game loop.
 #include "AssetManager.h"
 //This class is used to manage assets such as images, sounds, and fonts.
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
+
+namespace {
+struct GameLoopContext
+{
+	sf::RenderWindow* window;
+	std::vector<cScreen*>* screens;
+	int* screen;
+	AssetManager* am;
+};
+
+void runGameFrame(void* arg)
+{
+	auto* context = static_cast<GameLoopContext*>(arg);
+	if (*context->screen <= 0)
+	{
+		*context->screen = (*context->screens)[*context->screen]->Run(*context->window);
+		if (*context->screen == 0) return;
+		if (*context->screen == 2)
+		{
+			delete (*context->screens)[0];
+			cScreen* s0 = new Screen_1(context->am);
+			context->screens->push_back(s0);
+			*context->screen = 0;
+		}
+	}
+}
+}
 
 int main()
 {
@@ -15,9 +45,11 @@ int main()
 	//This means that the seed value is different every time the program runs, resulting in different random number sequences.
 	
 	AssetManager am; // creates an instance of the AssetManager class
+#ifndef __EMSCRIPTEN__
 	am.music1.play(); // starts playing a music track
+#endif
 	am.music1.setLoop(true); // sets the music to loop
-	sf::RenderWindow window(sf::VideoMode(1920, 1080), "Fallen Crown.exe", sf::Style::Resize); 
+	sf::RenderWindow window(sf::VideoMode(1920, 1080), "Fallen Crown", sf::Style::Close); 
 	// creates a new SFML RenderWindow object with the width and height specified in the AssetManager class and with the title "Fallen Crown.exe" and in full screen mode
 	window.setFramerateLimit(60); // sets the frame rate limit to 60 frames per second
 	window.setKeyRepeatEnabled(false); // disables key repeat
@@ -25,6 +57,10 @@ int main()
 	int screen = 0; // creates an integer variable screen initialized to 0
 	cScreen* s0 = new Screen_1(&am); // creates a new instance of the Screen_1 class and assigns it to s0 pointer
 	Screens.push_back(s0); // pushes the s0 pointer to the vector
+#ifdef __EMSCRIPTEN__
+	GameLoopContext context{&window, &Screens, &screen, &am};
+	emscripten_set_main_loop_arg(runGameFrame, &context, 60, 1);
+#else
 	while (screen <= 0) // enters a while loop
 	{
 		screen = Screens[screen]->Run(window); // runs the Run function of the current screen, passing the RenderWindow object as an argument
@@ -37,6 +73,7 @@ int main()
 			screen = 0; // sets the screen variable to 0
 		}
 	}
+#endif
 	return 0; // returns 0 at the end of the main function
 }
 

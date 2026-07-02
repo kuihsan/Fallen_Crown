@@ -2,11 +2,13 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <string>
+#include <vector>
 class AssetManager
 {
 public:
 	AssetManager();
 	~AssetManager();
+	std::string resolveAssetPath(const std::string& relativePath) const;
 	int s_width = 1920;
 	int s_height = 1080;
 	

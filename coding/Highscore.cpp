@@ -1,6 +1,9 @@
 #include "Highscore.h"
 #include "Screen_1.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
 
 // constructor for Highscore class that takes in the AssetManager object as a parameter
 Highscore::Highscore(AssetManager* _am) : am(_am)
@@ -60,17 +63,32 @@ Highscore::~Highscore()
 
 void Highscore::load()
 {
+#ifdef __EMSCRIPTEN__
+	highscore = EM_ASM_INT({
+		return parseInt(localStorage.getItem('fallen-crown-highscore') || '0', 10);
+	});
+#else
 	//Open the highscore file
 	std::ifstream ist("highscore.txt");
 	//Read the highscore from the file
-	ist >> highscore;
+	if (ist)
+		ist >> highscore;
+	else
+		highscore = 0;
 	//Close the file
 	ist.close();
-
+#endif
 }
 
 void Highscore::save(int score)
 {
+#ifdef __EMSCRIPTEN__
+	const int nextHighscore = ((highscore < score) ? score : highscore);
+	EM_ASM_({
+		localStorage.setItem('fallen-crown-highscore', String($0));
+	}, nextHighscore);
+	highscore = nextHighscore;
+#else
 	//Open the highscore file
 	std::ofstream ost("highscore.txt");
 	//Write the highest score to the file, either the current score or the current highscore
@@ -79,6 +97,7 @@ void Highscore::save(int score)
 	ost.close();
 	//Reload the highscore
 	load();
+#endif
 }
 
 // This function draws the highscore screen.
